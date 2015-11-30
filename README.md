@@ -11,3 +11,8 @@ Una tabla que contiene las administraciones públicas ordenadas por endeudamient
 
 ## Visualización 3
 Aún no tenemos la idea concreta de esta visualización pero proponemos usar los datos de partidos políticos y hacer un análisis sobre esa información.
+
+
+### Fuentes
+
+- [Deuda pública de entidades federativas y municipios 2015](http://www.hacienda.gob.mx/Estados/Deuda_Publica_EFM/2015/Paginas/1er-Trimestre.aspx)
