@@ -18,14 +18,14 @@ module.exports = {
     }, function(err, data) {
       deferred.resolve(data);
     });
+
     stream = fs.createReadStream(filename);
-    stream.on('error', function(error) {
-      deferred.reject(error);
-    });
+    stream.on('error', deferred.reject);
     stream.on('readable', function() {
       stream.pipe(parser);
     });
 
     return deferred.promise;
+
   }
 };

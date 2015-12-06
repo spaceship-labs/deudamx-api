@@ -7,8 +7,10 @@
 
 module.exports = {
   index: function(req, res) {
-    csvService.parse('sources/serie-historica-entidades.csv').then(function(data){
-      res.json(data);
-    });
+    importService.debtpib()
+      .then(importService.debt)
+      .then(function(data) {
+        res.json(data)
+      });
   }
 };
