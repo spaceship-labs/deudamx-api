@@ -7,6 +7,8 @@
 
 module.exports = {
   index: function(req, res) {
-    res.json('hi');
+    csvService.parse('sources/serie-historica-entidades.csv').then(function(data){
+      res.json(data);
+    });
   }
 };
