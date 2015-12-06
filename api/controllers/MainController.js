@@ -7,10 +7,15 @@
 
 module.exports = {
   index: function(req, res) {
-    importService.debtpib()
+    /*importService.debtpib()
       .then(importService.debt)
       .then(function(data) {
         res.json(data)
-      });
+      });*/
+    importService.obligations().then(function(data) {
+      res.json(data);
+    }, function(e) {
+      res.json(e);
+    });
   }
 };

@@ -5,12 +5,12 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var headers,
-  column;
+  column
+q = require('q');
 
 module.exports = {
   debt: function() {
-    var q = require('q'),
-      deferred = q.defer();
+    var deferred = q.defer();
 
     column = 'debt';
     csvService.parse('sources/serie-historica-entidades.csv')
@@ -20,8 +20,7 @@ module.exports = {
     return deferred.promise;
   },
   debtpib: function() {
-    var q = require('q'),
-      deferred = q.defer();
+    var deferred = q.defer();
 
     column = 'debtpib';
     csvService.parse('sources/serie-historica-deuda-pib-entidades.csv')
@@ -29,12 +28,55 @@ module.exports = {
       .then(deferred.resolve, deferred.reject);
 
     return deferred.promise;
+  },
+  obligations: function() {
+    var deferred = q.defer();
+    csvService.parse('sources/registro-deuda.csv')
+      .then(importObligations, deferred.reject)
+      .then(deferred.resolve, deferred.reject);
+    return deferred.promise;
   }
 };
 
+function importObligations(data) {
+  var deferred = q.defer();
+  var headers = data.splice(0, 1);
+  async.map(data, importObligation, function(e, res) {
+    if (e) {
+      deferred.reject(e);
+    } else {
+      deferred.resolve(res);
+    }
+  });
+  return deferred.promise;
+}
+
+function importObligation(data, cb) {
+  var entityName = data[0];
+  Entity.findOne({
+    name: {
+      like: entityName.trim()
+    }
+  }).exec(function(e, entity) {
+    if (e) {
+      cb(e)
+    };
+    if (!entity) {
+      cb(new Error('entity not found'));
+    };
+    var obligation = {};
+    var headers = ['acredited', 'creditor', 'type', 'signDate', 'inscriptionDate', 'ammount', 'balance', 'term' ,'collateral','destination'];
+
+    headers.forEach(function(header, i) {
+      obligation[header] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();
+    });
+    obligation.entity = entity.id;
+    DebtObligation.create(obligation).exec(cb);
+  });
+}
+
 function importStats(data) {
-  var q = require('q'),
-    deferred = q.defer();
+  var deferred = q.defer();
   headers = data.splice(0, 1)[0];
 
   headers.splice(0, 1);

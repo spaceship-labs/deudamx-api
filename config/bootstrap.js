@@ -10,8 +10,15 @@
  */
 
 module.exports.bootstrap = function(cb) {
-
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
+  String.prototype.capitalize = function() {
+    return this.toLowerCase().replace(/\b\w/g, function(m) {
+      return m.toUpperCase();
+    });
+  };
+  String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  };
   cb();
 };

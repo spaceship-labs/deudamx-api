@@ -15,8 +15,11 @@ module.exports = {
     stats: {
       type: 'json'
     },
+    obligations: {
+      type: 'collection',
+      via: 'entity'
+    }
   },
 
 
 };
-
