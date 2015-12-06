@@ -28,7 +28,13 @@ module.exports = {
     },
     type: {
       type: 'string',
-      enum: ['Crédito simple', 'Proyecto de prestación de servicios', 'Crédito en cuenta corriente', 'Garantía de pago oportuno', 'Emisión bursátil']
+      enum: [
+        'Crédito simple',
+        'Proyecto de prestación de servicios',
+        'Crédito en cuenta corriente',
+        'Garantía de pago oportuno',
+        'Emisión bursátil'
+      ]
     },
     collateral: {
       type: 'string',
@@ -48,7 +54,11 @@ module.exports = {
     },
     destination: {
       type: 'string',
-      enum: ['Inversión pública productiva', 'Inversión pública productiva/refinanciamiento', 'Refinanciamiento']
+      enum: [
+        'Inversión pública productiva',
+        'Inversión pública productiva/refinanciamiento',
+        'Refinanciamiento'
+      ]
     }
   }
 };

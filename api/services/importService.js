@@ -81,8 +81,6 @@ function importStats(data) {
 
   headers.splice(0, 1);
 
-
-
   async.map(data, importStatsRow, function(e, res) {
     if (e) {
       deferred.reject(e);
