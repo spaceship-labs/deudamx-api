@@ -1,3 +1,6 @@
+[![Code Climate](https://codeclimate.com/github/spaceship-labs/deudamx-api/badges/gpa.svg)](https://codeclimate.com/github/spaceship-labs/deudamx-api)
+[![Test Coverage](https://codeclimate.com/github/spaceship-labs/deudamx-api/badges/coverage.svg)](https://codeclimate.com/github/spaceship-labs/deudamx-api/coverage)
+
 # deudamx-api
 
 a [Sails](http://sailsjs.org) REST API
