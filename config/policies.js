@@ -21,7 +21,7 @@ module.exports.policies = {
   '*': false,
   'main': {
     'index': true
-  }
+  },
   'entity': {
     'find': true,
     'findOne': true
