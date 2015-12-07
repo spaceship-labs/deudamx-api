@@ -7,15 +7,17 @@
 
 module.exports = {
   index: function(req, res) {
+    return {
+      service: 'deudamx api',
+      version: '0.0.1',
+      documentation: 'http://github.com/spaceship-labs/deudamx-api',
+    };
     /*importService.debtpib()
       .then(importService.debt)
-      .then(function(data) {
-        res.json(data)
+      .then(importService.obligations).then(function(data) {
+        res.json(data);
+      }, function(e) {
+        res.json(e);
       });*/
-    importService.obligations().then(function(data) {
-      res.json(data);
-    }, function(e) {
-      res.json(e);
-    });
   }
 };
