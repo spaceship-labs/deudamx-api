@@ -18,13 +18,16 @@
 
 
 module.exports.policies = {
-   '*': false,
-   'entity' : {
-      'find' : true,
-      'findOne' : true
-    },
-    'debtObligation' : {
-      'find' : true,
-      'findOne' : true,
-    }
+  '*': false,
+  'main': {
+    'index': true
+  }
+  'entity': {
+    'find': true,
+    'findOne': true
+  },
+  'debtObligation': {
+    'find': true,
+    'findOne': true,
+  }
 };
