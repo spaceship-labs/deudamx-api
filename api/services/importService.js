@@ -5,8 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var headers,
-  column
-q = require('q');
+  column,
+  q = require('q');
 
 module.exports = {
   debt: function() {
@@ -29,14 +29,95 @@ module.exports = {
 
     return deferred.promise;
   },
+  population: function() {
+    var deferred = q.defer();
+
+    column = 'population';
+    csvService.parse('sources/poblacion-inegi.csv')
+      .then(function(data) {
+        var newTable = interpolatePopulation(data);
+        importStats(newTable).then(deferred.resolve,deferred.reject);
+      });
+
+    return deferred.promise;
+  },
   obligations: function() {
     var deferred = q.defer();
     csvService.parse('sources/registro-deuda.csv')
       .then(importObligations, deferred.reject)
       .then(deferred.resolve, deferred.reject);
     return deferred.promise;
+  },
+  setBalances: function() {
+    var deferred = q.defer();
+    Entity.find({}).exec(function(e, entities) {
+      if (e) {
+        deferred.reject(e);
+      }
+      async.map(entities, setBalance, function(e, res) {
+        if (e) {
+          deferred.reject(e)
+        }
+        deferred.resolve(res);
+      });
+    });
+    return deferred.promise;
   }
+
 };
+
+function interpolatePopulation(data) {
+  var deferred = q.defer();
+  var years = data.splice(0, 1)[0];
+  years.splice(0, 1);
+
+  var newData = data.map(function(row) {
+    var entity = row.splice(0, 1)[0];
+    var newRow = [];
+    var delta = 0;
+    row.forEach(function(pop, key) {
+      pop = parseInt(pop);
+      newRow.push(pop);
+      var thisYear = parseInt(years[key]);
+      if (key < row.length - 1) {
+        var nextYear = parseInt(years[key + 1]);
+        var nextPop = parseInt(row[key + 1]);
+        delta = (nextPop - pop) / (nextYear - thisYear);
+        for (var i = thisYear + 1; i < nextYear; i++) {
+          var extrapolation = ((i - thisYear) * delta) + pop;
+          newRow.push(Math.round(extrapolation));
+        }
+      } else {
+        for (var i = thisYear + 1; i <= 2015; i++) {
+          var extrapolation = ((i - thisYear) * delta) + pop;
+          newRow.push(Math.round(extrapolation));
+        }
+      }
+    });
+    //Remove 1990-1992
+    newRow.splice(0, 3);
+    newRow.splice(0, 0, entity);
+    return newRow;
+
+  });
+
+  //Insert Years header
+  var headers = ['entidad'];
+  for (var i = 1993; i <= 2014; i++) {
+    headers.push(i.toString());
+  }
+  headers.push('Marzo 2015');
+  newData.splice(0, 0, headers);
+
+  return newData;
+}
+
+function setBalance(entity, cb) {
+  Entity.update(entity.id, {
+    balance: entity.stats[entity.stats.length - 1].debt,
+
+  }, cb);
+}
 
 function importObligations(data) {
   var deferred = q.defer();
@@ -65,7 +146,7 @@ function importObligation(data, cb) {
       cb(new Error('entity not found'));
     };
     var obligation = {};
-    var headers = ['acredited', 'creditor', 'type', 'signDate', 'inscriptionDate', 'ammount', 'balance', 'term' ,'collateral','destination'];
+    var headers = ['acredited', 'creditor', 'type', 'signDate', 'inscriptionDate', 'ammount', 'balance', 'term', 'collateral', 'destination'];
 
     headers.forEach(function(header, i) {
       obligation[header] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();

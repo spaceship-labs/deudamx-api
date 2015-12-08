@@ -13,11 +13,15 @@ module.exports = {
       index: 'true',
     },
     stats: {
-      type: 'json'
+      type: 'json',
     },
     obligations: {
       type: 'collection',
       via: 'entity'
+    },
+    balance: {
+      type: 'float',
+      index: true
     }
   },
 
