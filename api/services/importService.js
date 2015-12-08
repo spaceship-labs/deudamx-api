@@ -36,7 +36,7 @@ module.exports = {
     csvService.parse('sources/poblacion-inegi.csv')
       .then(function(data) {
         var newTable = interpolatePopulation(data);
-        importStats(newTable).then(deferred.resolve,deferred.reject);
+        importStats(newTable).then(deferred.resolve, deferred.reject);
       });
 
     return deferred.promise;
@@ -62,6 +62,9 @@ module.exports = {
       });
     });
     return deferred.promise;
+  },
+  setDebtPerCapita: function() {
+
   }
 
 };
@@ -113,10 +116,21 @@ function interpolatePopulation(data) {
 }
 
 function setBalance(entity, cb) {
+  entity.stats = setPerCapita(entity.stats);
   Entity.update(entity.id, {
     balance: entity.stats[entity.stats.length - 1].debt,
-
+    balancegdp: entity.stats[entity.stats.length - 1].debtpib,
+    population: entity.stats[entity.stats.length - 1].population,
+    balancePerCapita :  entity.stats[entity.stats.length - 1].perCapita,
+    stats : entity.stats,
   }, cb);
+}
+
+function setPerCapita(stats) {
+  for (var i = 0; i < stats.length; i++) {
+    stats[i].perCapita = (stats[i].debt * 1000000) / stats[i].population;
+  }
+  return stats;
 }
 
 function importObligations(data) {

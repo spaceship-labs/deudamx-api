@@ -20,11 +20,11 @@ module.exports = {
         res.json(e);
       });
 */
+
     res.json({
       service: 'deudamx api',
       version: '0.0.1',
       documentation: 'http://github.com/spaceship-labs/deudamx-api',
     });
-
   }
 };
