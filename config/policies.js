@@ -29,5 +29,9 @@ module.exports.policies = {
   'debtObligation': {
     'find': true,
     'findOne': true,
+  },
+  'administration': {
+    'find': true,
+    'findOne': true,
   }
 };

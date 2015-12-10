@@ -9,6 +9,13 @@ var headers,
   q = require('q');
 
 module.exports = {
+  administrations: function() {
+    var deferred = q.defer();
+    csvService.parse('sources/administrations-sample.csv')
+      .then(importAdministrations)
+      .then(deferred.resolve,deferred.reject);
+    return deferred.promise;
+  },
   debt: function() {
     var deferred = q.defer();
 
@@ -29,6 +36,13 @@ module.exports = {
 
     return deferred.promise;
   },
+  obligations: function() {
+    var deferred = q.defer();
+    csvService.parse('sources/registro-deuda.csv')
+      .then(importObligations, deferred.reject)
+      .then(deferred.resolve, deferred.reject);
+    return deferred.promise;
+  },
   population: function() {
     var deferred = q.defer();
 
@@ -39,13 +53,6 @@ module.exports = {
         importStats(newTable).then(deferred.resolve, deferred.reject);
       });
 
-    return deferred.promise;
-  },
-  obligations: function() {
-    var deferred = q.defer();
-    csvService.parse('sources/registro-deuda.csv')
-      .then(importObligations, deferred.reject)
-      .then(deferred.resolve, deferred.reject);
     return deferred.promise;
   },
   setBalances: function() {
@@ -62,9 +69,6 @@ module.exports = {
       });
     });
     return deferred.promise;
-  },
-  setDebtPerCapita: function() {
-
   }
 
 };
@@ -121,8 +125,8 @@ function setBalance(entity, cb) {
     balance: entity.stats[entity.stats.length - 1].debt,
     balancegdp: entity.stats[entity.stats.length - 1].debtpib,
     population: entity.stats[entity.stats.length - 1].population,
-    balancePerCapita :  entity.stats[entity.stats.length - 1].perCapita,
-    stats : entity.stats,
+    balancePerCapita: entity.stats[entity.stats.length - 1].perCapita,
+    stats: entity.stats,
   }, cb);
 }
 
@@ -132,6 +136,21 @@ function setPerCapita(stats) {
   }
   return stats;
 }
+
+
+function importAdministrations(data) {
+  var deferred = q.defer();
+  data.splice(0,1);
+  async.mapSeries(data, importAdministration, function(e, res) {
+    if (e) {
+      deferred.reject(e);
+    } else {
+      deferred.resolve(res);
+    }
+  });
+  return deferred.promise;
+}
+
 
 function importObligations(data) {
   var deferred = q.defer();
@@ -146,7 +165,18 @@ function importObligations(data) {
   return deferred.promise;
 }
 
+function importAdministration(data,cb){
+  var headers = ['party','governor','start','end','picture','twitter'];
+  //console.log(data);
+  importRecord(data,headers,Administration,false,cb);
+}
+
 function importObligation(data, cb) {
+  var headers = ['acredited', 'creditor', 'type', 'signDate', 'inscriptionDate', 'ammount', 'balance', 'term', 'collateral', 'destination'];
+  importRecord(data,headers,DebtObligation,true,cb);
+}
+//Assumes first value in row is entity name
+function importRecord(data, headers, collection, normalizeStrings, cb) {
   var entityName = data[0];
   Entity.findOne({
     name: {
@@ -157,16 +187,21 @@ function importObligation(data, cb) {
       cb(e)
     };
     if (!entity) {
-      cb(new Error('entity not found'));
+      return cb(new Error('entity not found'));
     };
-    var obligation = {};
-    var headers = ['acredited', 'creditor', 'type', 'signDate', 'inscriptionDate', 'ammount', 'balance', 'term', 'collateral', 'destination'];
+    var record = {};
 
     headers.forEach(function(header, i) {
-      obligation[header] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();
+      if(normalizeStrings){
+        record[header] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();
+      }else{
+        record[header] = data[i + 1];
+      }
     });
-    obligation.entity = entity.id;
-    DebtObligation.create(obligation).exec(cb);
+    record.entity = entity.id;
+    //console.log(record);
+
+    collection.create(record).exec(cb);
   });
 }
 
