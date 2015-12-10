@@ -20,7 +20,7 @@ module.exports = {
     ammount: {
       type: 'integer'
     },
-    balace: {
+    balance: {
       type: 'float'
     },
     term: {
