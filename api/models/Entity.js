@@ -16,8 +16,12 @@ module.exports = {
       type: 'json',
     },
     obligations: {
-      type: 'collection',
+      collection : 'debtObligation',
       via: 'entity'
+    },
+    administrations : {
+      collection : 'administration',
+      via : 'entity'
     },
     balance: {
       type: 'float',

@@ -20,7 +20,8 @@
 module.exports.policies = {
   '*': false,
   'main': {
-    'index': true
+    'index': true,
+    'install' : true,
   },
   'entity': {
     'find': true,

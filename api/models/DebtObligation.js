@@ -11,6 +11,9 @@ module.exports = {
     entity: {
       model: 'entity'
     },
+    administration : {
+      model : 'administration'
+    },
     inscriptionDate: {
       type: 'date'
     },

@@ -16,6 +16,10 @@ module.exports = {
     },
     entity : {
       model : 'entity'
+    },
+    obligations : {
+      collection : 'debtObligation',
+      via : 'administration'
     }
   }
 };

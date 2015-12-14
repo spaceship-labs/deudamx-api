@@ -7,25 +7,19 @@
 
 module.exports = {
   index: function(req, res) {
-    /*
-        importService
-          .debtpib()
-          .then(importService.debt)
-          .then(importService.population)
-          .then(importService.obligations)
-          .then(importService.administrations)
-          .then(importService.setBalances)
-          .then(function(data) {
-            res.json(data);
-          }, function(e) {
-            res.json(e);
-          });
-    */
 
     res.json({
       service: 'deudamx api',
       version: '0.0.1',
       documentation: 'http://github.com/spaceship-labs/deudamx-api',
+      description : 'contains information about sub-national public debt in Mexico'
     });
+
+  },
+  install: function(req, res) {
+    installService.all()
+      .then(res.json.bind(res),res.json.bind(res));
   }
+
+
 };
