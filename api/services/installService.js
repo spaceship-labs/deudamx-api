@@ -8,16 +8,16 @@ var q = require('q');
 
 module.exports = {
   all: function() {
-    return statsService.setAdmonStats();
-    //return importService
-      //.debtpib()
-      //.then(importService.debt)
-      //.then(importService.population)
-      //.then(importService.obligations)
-      //.then(importService.administrations)
-      //.then(importService.setBalances)
-      //.then(statsService.relateObligations)
-      //.then(statsService.setAdmonStats);
+    //return statsService.setAdmonStats();
+    return importService
+      .debtpib()
+      .then(importService.debt)
+      .then(importService.population)
+      .then(importService.obligations)
+      .then(importService.administrations)
+      .then(importService.setBalances)
+      .then(statsService.relateObligations)
+      .then(statsService.setAdmonStats);
   }
 
 };

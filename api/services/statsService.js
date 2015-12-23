@@ -23,14 +23,25 @@ module.exports = {
       .populate('obligations')
       .populate('entity')
       .then(function(admons) {
-        return setAdmonStats(admons[15]);
-        //return q.all(admons.map(setAdmonStats));
+        return q.all(admons.map(setAdmonStats));
       });
   }
 }
 
 function setAdmonStats(admon) {
-  var obligations = new gauss.Collection(admon.obligations);
+
+  var stats = {
+    obStats: calculateStatsFromObligations(admon.obligations),
+    entityStats: calculateStatsFromEntity(admon),
+  };
+
+  return Administration.update(admon.id, {
+    stats: stats
+  });
+}
+
+function calculateStatsFromObligations(obligations) {
+  obligations = new gauss.Collection(obligations);
 
   var sum = obligations.map(
     function(ob) {
@@ -41,47 +52,87 @@ function setAdmonStats(admon) {
       return ob.balance
     }).toVector().sum();
   var count = obligations.length;
-
-
-  var stats = {
+  return {
     sum: sum,
-    count: count,
     balance: balance,
-    years : calculateStatsFromEntity(admon),
-  };
-
-  return Administration.update(admon.id, {
-    stats: stats
-  });
+    count: count
+  }
 }
 
 function calculateStatsFromEntity(admon) {
-  //this da main science here
-  var start = new Date(admon.start)
-  var ends = admon.end ? new Date(admon.end) : false;
-  //Add a year so that it overlaps (chek the paper)
-  ends.setYear(ends.getFullYear() + 1);
+  var deltas = getYearDeltas(admon.entity.stats);
+  var relevantDeltas = deltas.filter(function(delta) {
+    var startYear = admon.start.getFullYear();
+    startYear = startYear >= 1994 ? startYear : 1994;
+    if (admon.end) {
 
-  var years = admon.entity.stats.filter(function(stat) {
-    if (stat.year === 'Marzo 2015') {
-      stat.year = '2016';
+      return delta.start === startYear || delta.start === admon.end.getFullYear();
     } else {
-      //Add one year to stat because stat is from end of the year and date gets first day of year
-      stat.year = parseInt(stat.year) + 1
-      stat.year = stat.year.toString();
-    }
-    var statDate = new Date(stat.year);
-    // If the administration has ended check if the date is in between else check with just lower bound
-    if (ends) {
-      return statDate >= start && statDate <= ends;
-    } else {
-      return statDate >= start;
+      return delta.start === startYear || delta.end === 2016;
     }
   });
 
-  console.log(years.length);
-  console.log(start, ends);
-  return years;
+
+  if (relevantDeltas.length > 1) {
+    var start = getLinearAproximations(admon, relevantDeltas[0], admon.start);
+    var end = getLinearAproximations(admon, relevantDeltas[1], admon.end);
+  } else if (relevantDeltas.length === 1) {
+    if (admon.start.getFullYear() === admon.end.getFullYear()) {
+      var start = getLinearAproximations(admon, relevantDeltas[0], admon.start);
+      var end = getLinearAproximations(admon, relevantDeltas[0], admon.end);
+    } else {
+      console.log('not enough data for' + admon.start.getFullYear() + ' - ' + admon.end.getFullYear());
+      return false;
+    }
+  } else {
+    console.log('no data for' + admon.start.getFullYear() + ' - ' + admon.end.getFullYear());
+    return false;
+  }
+  return {
+    start: start,
+    end: end,
+    delta: {
+      debt: end.debt - start.debt,
+      debtgdp: end.debtgdp - start.debtgdp,
+      debtPerCapita: end.debtPerCapita - start.debtPerCapita
+    }
+  };
+}
+
+function getLinearAproximations(admon, delta, date) {
+  date = date ? date : new Date('2016');
+  var yearStart = new Date(date.getFullYear().toString());
+  var pct = Math.abs(date - yearStart) / (1000 * 3600 * 24 * 365);
+  return {
+    debt: parseFloat(delta.stat.debt) + (pct * delta.deltaDebt),
+    debtgdp: parseFloat(delta.stat.debtpib) + (pct * delta.deltaGdp),
+    debtPerCapita: parseFloat(delta.stat.perCapita) + (pct * delta.deltaPerCapita)
+  }
+}
+
+function getYearDeltas(stats) {
+  var deltas = stats.map(function(stat, index) {
+    if (index !== 0) {
+      if (stat.year === 'Marzo 2015') {
+        stat.year = '2015'
+      }
+      var prevStat = stats[index - 1];
+      var end = parseInt(stat.year) + 1;
+      prevStat.year = parseInt(prevStat.year) + 1;
+      return {
+        start: parseInt(stat.year),
+        end: end,
+        deltaDebt: stat.debt - prevStat.debt,
+        deltaGdp: stat.debtpib - prevStat.debtpib,
+        deltaPerCapita: stat.perCapita - prevStat.perCapita,
+        stat: prevStat
+      }
+    } else {
+      return null;
+    }
+  });
+  deltas.splice(0, 1);
+  return deltas;
 }
 
 function findObligation(admon) {
