@@ -1,0 +1,25 @@
+[{
+  "year": "2012",
+  "debtpib": "0.1",
+  "debt": "500",
+  "population": 50,
+  "perCapita": 10
+}, {
+  "year": "2013",
+  "debtpib": "0.2",
+  "debt": "1000",
+  "population": 100,
+  "perCapita": 10
+}, {
+  "year": "2014",
+  "debtpib": "0.3",
+  "debt": "2000",
+  "population": 125,
+  "perCapita": 16
+}, {
+  "year": "Marzo 2015",
+  "debtpib": "0.4",
+  "debt": "4000",
+  "population": 160,
+  "perCapita": 25
+}]

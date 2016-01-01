@@ -1,0 +1,33 @@
+[{
+  "name": "Baja California Sur",
+  "stats": [{
+    "year": "2012",
+    "debtpib": "0.1",
+    "debt": "500",
+    "population": 50,
+    "perCapita": 10
+  }, {
+    "year": "2013",
+    "debtpib": "0.2",
+    "debt": "1000",
+    "population": 100,
+    "perCapita": 10
+  }, {
+    "year": "2014",
+    "debtpib": "0.3",
+    "debt": "2000",
+    "population": 125,
+    "perCapita": 16
+  }, {
+    "year": "Marzo 2015",
+    "debtpib": "0.4",
+    "debt": "4000",
+    "population": 160,
+    "perCapita": 25
+  }],
+  "balance": 2285.7553395,
+  "balancegdp": "1.7018078447809",
+  "population": 761882,
+  "balancePerCapita": 3000.1435123811825,
+  "id": "56704a05e4a758e406fed274"
+}]

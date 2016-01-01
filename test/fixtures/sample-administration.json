@@ -1,0 +1,36 @@
+{
+  "entity": {
+    "name": "Baja California Sur",
+    "stats": [{
+      "year": "2012",
+      "debtpib": "0.1",
+      "debt": "500",
+      "population": 50,
+      "perCapita": 10
+    }, {
+      "year": "2013",
+      "debtpib": "0.2",
+      "debt": "1000",
+      "population": 100,
+      "perCapita": 10
+    }, {
+      "year": "2014",
+      "debtpib": "0.3",
+      "debt": "2000",
+      "population": 125,
+      "perCapita": 16
+    }, {
+      "year": "Marzo 2015",
+      "debtpib": "0.4",
+      "debt": "4000",
+      "population": 160,
+      "perCapita": 25
+    }],
+    "id": "56704a05e4a758e406fed274"
+  },
+  "party": "PSM",
+  "governor": "Fake Dude",
+  "start": "2013-07-02T00:00:00.000Z",
+  "end": "2014-06-01T00:00:00.000Z",
+  "id": "567052f0577bcb430a530b07"
+}
