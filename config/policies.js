@@ -22,6 +22,7 @@ module.exports.policies = {
   'main': {
     'index': true,
     'install' : true,
+    'test' : true
   },
   'entity': {
     'find': true,

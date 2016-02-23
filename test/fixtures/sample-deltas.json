@@ -1,0 +1,40 @@
+[{
+  "start": 2013,
+  "end": 2014,
+  "deltaDebt": 500,
+  "deltaGdp": 0.1,
+  "deltaPerCapita": 0,
+  "stat": {
+    "year": "2012",
+    "debtpib": "0.1",
+    "debt": "500",
+    "population": 50,
+    "perCapita": 10
+  }
+}, {
+  "start": 2014,
+  "end": 2015,
+  "deltaDebt": 1000,
+  "deltaGdp": 0.01,
+  "deltaPerCapita": 6,
+  "stat": {
+    "year": "2013",
+    "debtpib": "0.2",
+    "debt": "1000",
+    "population": 100,
+    "perCapita": 10
+  }
+}, {
+  "start": 2015,
+  "end": 2016,
+  "deltaDebt": 2000,
+  "deltaGdp": 0.1,
+  "deltaPerCapita": 9,
+  "stat": {
+    "year": "2014",
+    "debtpib": "0.3",
+    "debt": "2000",
+    "population": 125,
+    "perCapita": 16
+  }
+}]

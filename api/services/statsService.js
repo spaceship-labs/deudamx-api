@@ -20,23 +20,100 @@ module.exports = {
     console.log('setting administration stats');
     return Administration
       .find()
+      //.skip(5)
+      //.limit(1)
       .populate('obligations')
       .populate('entity')
       .then(function(admons) {
         return q.all(admons.map(setAdmonStats));
       });
   },
-  calculateStatsFromEntity: calculateStatsFromEntity,
-  getYearDeltas: getYearDeltas,
+  calculateGDPDebt : calculateGDPDebt,
+  getAdmonAproximations: getAdmonAproximations
 }
 
-function setAdmonStats(admon) {
+function calculateGDPDebt(){
 
+}
+
+function getAdmonAproximations(admon) {
+  if (admon && admon.entity) {
+    var debtVector = mapVector(admon.entity.stats, 'debt');
+    var gdpVector = mapVector(admon.entity.stats, 'gdpdebt');
+    var perCapitaVector = mapVector(admon.entity.stats, 'perCapita');
+
+    var start = {
+      debt: getLinearAproximation(debtVector, admon.start),
+      debtgdp: getLinearAproximation(gdpVector, admon.start),
+      debtPerCapita: getLinearAproximation(perCapitaVector, admon.start),
+    }
+    if(!admon.end){
+      admon.end = '2016';
+    }
+    var end = {
+      debt: getLinearAproximation(debtVector, admon.end),
+      debtgdp: getLinearAproximation(gdpVector, admon.end),
+      debtPerCapita: getLinearAproximation(perCapitaVector, admon.end),
+    }
+
+    return {
+      start: start,
+      end: end,
+      delta: {
+        debt: end.debt - start.debt,
+        debtgdp: end.debtgdp - start.debtgdp,
+        debtPerCapita: end.debtPerCapita - start.debtPerCapita
+      }
+    };
+  }else{
+    return false;
+  }
+}
+
+function mapVector(stats, field) {
+  return stats.map(function(stat) {
+    if (stat.year === 'Marzo 2015') {
+      stat.year = 2015;
+    }
+    var year = parseInt(stat.year) + 1;
+    year = new Date(year.toString());
+    return [Date.parse(year), parseFloat(stat[field])];
+  });
+}
+
+function getLinearAproximation(vector, date) {
+  var i;
+  date = new Date(date);
+  var x = date.getTime();
+
+  for (i = 0; i < vector.length; i++) {
+    if (vector[i][0] >= x) {
+      break;
+    }
+  }
+  if(i === 0){
+    return vector[0][1];
+  }else{
+    var start = vector[i - 1];
+    var end = vector[i];
+    var m = (end[1] - start[1]) / (end[0] - start[0]);
+    var b = end[1] - m * end[0];
+    var y = m * x + b;
+  }
+
+  return y;
+
+}
+
+
+
+function setAdmonStats(admon) {
+  console.log(admon.governor);
   var stats = {
     obStats: calculateStatsFromObligations(admon.obligations),
-    entityStats: calculateStatsFromEntity(admon),
+    entityStats: getAdmonAproximations(admon),
   };
-
+  console.log(stats);
   return Administration.update(admon.id, {
     stats: stats
   });
@@ -61,95 +138,6 @@ function calculateStatsFromObligations(obligations) {
   }
 }
 
-function calculateStatsFromEntity(admon) {
-  if (admon && admon.entity) {
-    var deltas = getYearDeltas(admon.entity.stats);
-    var startDate = new Date(admon.start);
-    var endDate = new Date(admon.end);
-
-    var relevantDeltas = deltas.filter(function(delta) {
-
-      var startYear = startDate.getFullYear();
-      startYear = startYear >= admon.entity.stats[0].year ? startYear : admon.entity.stats[0].year;
-      if (admon.end) {
-        return delta.start === startYear || delta.start === endDate.getFullYear();
-      } else {
-        return delta.start === startYear || delta.end === 2016;
-      }
-
-    });
-
-
-    if (relevantDeltas.length > 1) {
-      var start = getLinearAproximations(admon, relevantDeltas[0], startDate);
-      var end = getLinearAproximations(admon, relevantDeltas[1], endDate);
-    } else if (relevantDeltas.length === 1) {
-      if (startDate.getFullYear() === endDate.getFullYear()) {
-        var start = getLinearAproximations(admon, relevantDeltas[0], startDate);
-        var end = getLinearAproximations(admon, relevantDeltas[0], endDate);
-      } else {
-        console.log('not enough data for' + startDate.getFullYear() + ' - ' + endDate.getFullYear());
-        return false;
-      }
-    } else {
-      console.log('no data for' + startDate.getFullYear() + ' - ' + endDate.getFullYear());
-      return false;
-    }
-    return {
-      start: start,
-      end: end,
-      delta: {
-        debt: end.debt - start.debt,
-        debtgdp: end.debtgdp - start.debtgdp,
-        debtPerCapita: end.debtPerCapita - start.debtPerCapita
-      }
-    };
-  } else {
-    return false;
-  }
-}
-
-function getLinearAproximations(admon, delta, date) {
-  date = date ? date : new Date('2016');
-  var yearStart = new Date(date.getFullYear().toString());
-  var pct = Math.abs(date - yearStart) / (1000 * 3600 * 24 * 365);
-  return {
-    debt: parseFloat(delta.stat.debt) + (pct * delta.deltaDebt),
-    debtgdp: parseFloat(delta.stat.debtpib) + (pct * delta.deltaGdp),
-    debtPerCapita: parseFloat(delta.stat.perCapita) + (pct * delta.deltaPerCapita)
-  }
-}
-
-function getYearDeltas(stats) {
-  if (stats) {
-    var deltas = stats.map(function(stat, index) {
-      if (index !== 0) {
-        if (stat.year === 'Marzo 2015') {
-          stat.year = '2015'
-        }
-        var prevStat = stats[index - 1];
-        var end = parseInt(stat.year) + 1;
-        var deltaDebt = parseFloat(stat.debt) - parseFloat(prevStat.debt);
-        var deltaGdp = parseFloat(stat.debtpib) - parseFloat(prevStat.debtpib);
-        deltaPerCapita = stat.perCapita - prevStat.perCapita;
-        return {
-          start: parseInt(stat.year),
-          end: end,
-          deltaDebt: deltaDebt,
-          deltaGdp: deltaGdp,
-          deltaPerCapita: deltaPerCapita,
-          stat: prevStat
-        }
-      } else {
-        return null;
-      }
-    });
-    deltas.splice(0, 1);
-    return deltas;
-  } else {
-    return false;
-  }
-}
 
 function findObligation(admon) {
   var query = {

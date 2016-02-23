@@ -5,19 +5,19 @@
       "year": "2012",
       "debtpib": "1",
       "gdpdebt": "1",
-      "debt": "1000",
+      "debt": "500",
       "perCapita": 10
     }, {
       "year": "2013",
       "debtpib": "2",
       "gdpdebt": "2",
-      "debt": "2000",
+      "debt": "1000",
       "perCapita": 20
     }, {
       "year": "2014",
       "debtpib": "3",
       "gdpdebt": "3",
-      "debt": "3000",
+      "debt": "2000",
       "perCapita": 30
     }, {
       "year": "Marzo 2015",
@@ -31,6 +31,6 @@
   "party": "PSM",
   "governor": "Fake Dude",
   "start": "2013-07-02T12:00:00.000Z",
-  "end": "2014-07-02T12:00:00.000Z",
+  "end": "",
   "id": "567052f0577bcb430a530b07"
 }

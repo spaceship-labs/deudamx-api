@@ -4,49 +4,47 @@ var fs = require('fs'),
   json = requireHelper('jsonHelper');
 
 describe(TEST_NAME, function() {
-  describe('calculateStatsFromEntity', function() {
+  describe('getAdmonAproximations', function() {
     it('should return false if no parameter', function() {
-      var result = statsService.calculateStatsFromEntity();
+      var result = statsService.getAdmonAproximations();
       result.should.equal(false);
     });
     //Normal means that there are stats for every year of the administration
     it('should return the proper stats for a normal administration', function(done) {
-      var result = statsService.calculateStatsFromEntity();
       json.load('sample-administration.json', function(admon) {
-        var result = statsService.calculateStatsFromEntity(admon);
-        console.log(result);
+        var result = statsService.getAdmonAproximations(admon);
+        result.start.debt.should.equal(1500);
+        result.start.debtgdp.should.equal(1.5);
+        result.start.debtPerCapita.should.equal(15);
+        result.end.debt.should.equal(2500);
+        result.end.debtgdp.should.equal(2.5);
+        result.end.debtPerCapita.should.equal(25);
+        result.delta.debt.should.equal(1000);
+        result.delta.debtgdp.should.equal(1);
+        result.delta.debtPerCapita.should.equal(10);
+        done();
+      });
+    });
+
+    //
+    it('should return the proper stats for a administration with no end', function(done) {
+      json.load('sample-administation2.json', function(admon) {
+        var result = statsService.getAdmonAproximations(admon);
+        result.start.debt.should.equal(750);
+        result.start.debtgdp.should.equal(1.5);
+        result.start.debtPerCapita.should.equal(15);
+        resul40end.debt.should.equal(4000);
+        result.end.debtgdp.should.equal(4);
+        result.end.debtPerCapita.should.equal(40);
+        result.delta.debt.should.equal(3250);
+        result.delta.debtgdp.should.equal(2.5);
+        result.delta.debtPerCapita.should.equal(25);
         done();
       });
     });
 
   });
 
-  describe('getYearDeltas', function() {
-
-    it('should return false if no parameter', function() {
-      var result = statsService.getYearDeltas();
-      result.should.equal(false);
-    });
-
-    it('should return the proper stats', function(done) {
-      json.load('sample-stats.json', function(sampleStats) {
-        var result = statsService.getYearDeltas(sampleStats);
-        var year = 2013;
-        var deltaDebt = 500;
-        var perCapita = [0, 6, 9];
-        result.length.should.equal(sampleStats.length - 1);
-        result.forEach(function(delta, key) {
-          delta.start.should.equal(year++);
-          delta.end.should.equal(year);
-          delta.deltaDebt.should.equal(deltaDebt);
-          Math.round(delta.deltaGdp * 10).should.equal(1);
-          delta.deltaPerCapita.should.equal(perCapita[key]);
-          deltaDebt = deltaDebt * 2;
-        });
-        done();
-      });
-    });
-  });
 
 
 });

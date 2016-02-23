@@ -11,11 +11,13 @@ module.exports = {
     //return statsService.setAdmonStats();
     return importService
       .debtpib()
+      .then(importService.gdp)
       .then(importService.debt)
       .then(importService.population)
       .then(importService.obligations)
       .then(importService.administrations)
       .then(importService.setBalances)
+      .then(Entity.calculateGDPDebt)
       .then(statsService.relateObligations)
       .then(statsService.setAdmonStats);
   }

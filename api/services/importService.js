@@ -12,7 +12,7 @@ module.exports = {
   administrations: function() {
     var deferred = q.defer();
     console.log('importing administrations');
-    csvService.parse('sources/administrations-sample.csv')
+    csvService.parse('sources/administrations.csv')
       .then(importAdministrations)
       .then(deferred.resolve,deferred.reject);
     return deferred.promise;
@@ -32,6 +32,16 @@ module.exports = {
     console.log('importing debt gdp series');
     column = 'debtpib';
     csvService.parse('sources/serie-historica-deuda-pib-entidades.csv')
+      .then(importStats, deferred.reject)
+      .then(deferred.resolve, deferred.reject);
+
+    return deferred.promise;
+  },
+  gdp: function() {
+    var deferred = q.defer();
+    console.log('importing gdp series');
+    column = 'gdp';
+    csvService.parse('sources/base-pib.csv')
       .then(importStats, deferred.reject)
       .then(deferred.resolve, deferred.reject);
 
@@ -62,6 +72,7 @@ module.exports = {
     console.log('setting balance stats');
     Entity.find({}).exec(function(e, entities) {
       if (e) {
+        console.log(e);
         deferred.reject(e);
       }
       async.map(entities, setBalance, function(e, res) {
@@ -266,5 +277,6 @@ function sortSeries(row, exStats) {
     ret[column] = data;
     return ret;
   });
-  return stats
+
+  return stats;
 }
