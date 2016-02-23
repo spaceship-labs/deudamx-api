@@ -33,7 +33,7 @@ describe(TEST_NAME, function() {
         result.start.debt.should.equal(750);
         result.start.debtgdp.should.equal(1.5);
         result.start.debtPerCapita.should.equal(15);
-        resul40end.debt.should.equal(4000);
+        result.end.debt.should.equal(4000);
         result.end.debtgdp.should.equal(4);
         result.end.debtPerCapita.should.equal(40);
         result.delta.debt.should.equal(3250);
