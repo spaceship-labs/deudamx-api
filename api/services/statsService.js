@@ -108,12 +108,12 @@ function getLinearAproximation(vector, date) {
 
 
 function setAdmonStats(admon) {
-  console.log(admon.governor);
+  //console.log(admon.governor);
   var stats = {
     obStats: calculateStatsFromObligations(admon.obligations),
     entityStats: getAdmonAproximations(admon),
   };
-  console.log(stats);
+  //console.log(stats);
   return Administration.update(admon.id, {
     stats: stats
   });

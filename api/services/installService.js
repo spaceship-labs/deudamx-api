@@ -19,7 +19,10 @@ module.exports = {
       .then(importService.setBalances)
       .then(Entity.calculateGDPDebt)
       .then(statsService.relateObligations)
-      .then(statsService.setAdmonStats);
+      .then(statsService.setAdmonStats)
+      .then(function(stats){
+        console.log('done');
+      });
   }
 
 };

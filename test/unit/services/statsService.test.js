@@ -26,7 +26,7 @@ describe(TEST_NAME, function() {
       });
     });
 
-    //
+    //Ongoing administration
     it('should return the proper stats for a administration with no end', function(done) {
       json.load('sample-administation2.json', function(admon) {
         var result = statsService.getAdmonAproximations(admon);
