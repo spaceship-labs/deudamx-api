@@ -38,7 +38,7 @@ function calculateGDPDebt(){
 
 function getAdmonAproximations(admon) {
   if (admon && admon.entity) {
-    //console.log(admon.entity.stats);
+    console.log(admon.entity.stats);
     var debtVector = mapVector(admon.entity.stats, 'debt');
     var gdpVector = mapVector(admon.entity.stats, 'gdpdebt');
     var perCapitaVector = mapVector(admon.entity.stats, 'perCapita');
@@ -49,7 +49,7 @@ function getAdmonAproximations(admon) {
       debtPerCapita: getLinearAproximation(perCapitaVector, admon.start),
     }
     if(!admon.end){
-      admon.end = '2015';
+      admon.end = '2016';
     }
     var end = {
       debt: getLinearAproximation(debtVector, admon.end),
@@ -101,9 +101,7 @@ function getLinearAproximation(vector, date) {
     var b = end[1] - m * end[0];
     var y = m * x + b;
   }
-
   return y;
-
 }
 
 
