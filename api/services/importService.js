@@ -168,8 +168,17 @@ function importAdministrations(data) {
 
 function importObligations(data) {
   var deferred = q.defer();
-  var headers = data.splice(0, 1);
-  async.map(data, importObligation, function(e, res) {
+  data.splice(0, 1);
+  //console.log(data);
+  async.map(data, function(el,cb) {
+      if (el.length == 11)
+        importObligation(el,cb);
+      else {
+          console.log(el);
+          cb(false,false);
+      }
+
+  }, function(e, res) {
     if (e) {
       deferred.reject(e);
     } else {
@@ -191,31 +200,48 @@ function importObligation(data, cb) {
 }
 //Assumes first value in row is entity name
 function importRecord(data, headers, collection, normalizeStrings, cb) {
-  var entityName = data[0];
+  var entityName = data[0].trim();
   Entity.findOne({
     name: {
-      like: entityName.trim()
+      like: entityName
     }
   }).exec(function(e, entity) {
     if (e) {
-      cb(e)
-    };
+        cb(e);
+    }
     if (!entity) {
-      return cb(new Error('entity not found'));
-    };
-    var record = {};
+        //console.log(entityName);
+        //console.log(data);
+        var error = {};
+        error.e = new Error('entity not found');
+        error.data = data;
+        cb(error);
+    } else {
+        var record = {};
 
-    headers.forEach(function(header, i) {
-      if(normalizeStrings){
-        record[header] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();
-      }else{
-        record[header] = data[i + 1];
-      }
-    });
-    record.entity = entity.id;
-    //console.log(record);
+        for (var i = 0;i<headers.length;i++){
+            if(normalizeStrings && typeof data[i + 1] == 'string'){
+                record[headers[i]] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();
+            }else{
+                console.log(data[i + 1]);
+                record[headers[i]] = data[i + 1];
+            }
+        }
+        record.entity = entity.id;
 
-    collection.create(record).exec(cb);
+        collection.create(record).exec(function(err,re){
+            if (err) {
+                //console.log(err);
+                record.error = err.toString();
+                record.destination = 'No data';
+                collection.create(record).exec(function(er,r){
+                    cb(er,r);
+                });
+            } else
+                cb(false,re);
+        });
+    }
+
   });
 }
 
@@ -238,6 +264,7 @@ function importStats(data) {
 
 function importStatsRow(row, cb) {
   var name = row[0].trim();
+  //console.log(name);
   Entity.findOrCreate({
     name: name
   }, {
@@ -245,10 +272,11 @@ function importStatsRow(row, cb) {
   }, function(e, entity) {
     if (e) {
       cb(e);
+    } else {
+        Entity.update(entity.id, {
+            stats: sortSeries(row, entity.stats)
+        }).exec(cb);
     }
-    Entity.update(entity.id, {
-      stats: sortSeries(row, entity.stats)
-    }).exec(cb);
   });
 
 }
@@ -279,4 +307,12 @@ function sortSeries(row, exStats) {
   });
 
   return stats;
+}
+
+function replaceAccents(string){
+    var replace_map = {"á" : 'a', "é" : 'e', "í" : 'i', "ó" : 'o', "ú" : 'u'};
+    string = string.toLowerCase().replace(/[áéíóú]/g, function(match){
+        return replace_map[match];
+    });
+    return string;
 }

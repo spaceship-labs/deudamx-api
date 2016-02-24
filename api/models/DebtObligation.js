@@ -51,7 +51,12 @@ module.exports = {
         'Ingresos propios/participaciones federales',
         'Participaciones federales/ingresos propios',
         'Participaciones federales/aportaciones federales',
-        'Participaciones federales/bono cupón cero municipal'
+        'Participaciones federales/bono cupón cero municipal',
+        //news juans
+        'Participapública productiva',
+        'Inversi� federales',
+        'Inversión �n pública productiva',
+        'Participaciones�blica productiva'
       ]
 
     },
@@ -60,8 +65,11 @@ module.exports = {
       enum: [
         'Inversión pública productiva',
         'Inversión pública productiva/refinanciamiento',
-        'Refinanciamiento'
+        'Refinanciamiento',
+        //error
+        'No data'
       ]
-    }
+    },
+    error : 'string'
   }
 };

@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var q = require('q'),
-  gauss = require('gauss')
+  gauss = require('gauss');
 
 module.exports = {
   relateObligations: function() {
@@ -20,8 +20,8 @@ module.exports = {
     console.log('setting administration stats');
     return Administration
       .find()
-      //.skip(5)
-      //.limit(1)
+      //.skip(30)
+      //.limit(40)
       .populate('obligations')
       .populate('entity')
       .then(function(admons) {
@@ -38,6 +38,7 @@ function calculateGDPDebt(){
 
 function getAdmonAproximations(admon) {
   if (admon && admon.entity) {
+    //console.log(admon.entity.stats);
     var debtVector = mapVector(admon.entity.stats, 'debt');
     var gdpVector = mapVector(admon.entity.stats, 'gdpdebt');
     var perCapitaVector = mapVector(admon.entity.stats, 'perCapita');
@@ -48,7 +49,7 @@ function getAdmonAproximations(admon) {
       debtPerCapita: getLinearAproximation(perCapitaVector, admon.start),
     }
     if(!admon.end){
-      admon.end = '2016';
+      admon.end = '2015';
     }
     var end = {
       debt: getLinearAproximation(debtVector, admon.end),
@@ -108,7 +109,6 @@ function getLinearAproximation(vector, date) {
 
 
 function setAdmonStats(admon) {
-  //console.log(admon.governor);
   var stats = {
     obStats: calculateStatsFromObligations(admon.obligations),
     entityStats: getAdmonAproximations(admon),
@@ -137,7 +137,6 @@ function calculateStatsFromObligations(obligations) {
     count: count
   }
 }
-
 
 function findObligation(admon) {
   var query = {
