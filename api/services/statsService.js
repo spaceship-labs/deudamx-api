@@ -5,7 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var q = require('q'),
-  gauss = require('gauss');
+  gauss = require('gauss'),
+  i = 0;
 
 module.exports = {
   relateObligations: function() {
@@ -38,7 +39,6 @@ function calculateGDPDebt(){
 
 function getAdmonAproximations(admon) {
   if (admon && admon.entity) {
-    console.log(admon.entity.stats);
     var debtVector = mapVector(admon.entity.stats, 'debt');
     var gdpVector = mapVector(admon.entity.stats, 'gdpdebt');
     var perCapitaVector = mapVector(admon.entity.stats, 'perCapita');
@@ -111,7 +111,7 @@ function setAdmonStats(admon) {
     obStats: calculateStatsFromObligations(admon.obligations),
     entityStats: getAdmonAproximations(admon),
   };
-  //console.log(stats);
+  console.log(i++);
   return Administration.update(admon.id, {
     stats: stats
   });
