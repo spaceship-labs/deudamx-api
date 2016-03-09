@@ -124,10 +124,9 @@ function interpolatePopulation(data) {
 
   //Insert Years header
   var headers = ['entidad'];
-  for (var i = 1993; i <= 2014; i++) {
+  for (var i = 1993; i <= 2015; i++) {
     headers.push(i.toString());
   }
-  headers.push('Marzo 2015');
   newData.splice(0, 0, headers);
 
   return newData;

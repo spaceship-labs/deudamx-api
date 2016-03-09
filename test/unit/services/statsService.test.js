@@ -43,6 +43,31 @@ describe(TEST_NAME, function() {
       });
     });
 
+    //check all administrations
+//      it('all administrations must have stats', function(done) {
+//
+//          Administration.find().limit().populateAll().exec(function(err,admons) {
+//            var noStats = [];
+//            async.each(admons,function(el,cb) {
+//                //console.log(el.entity.stats);
+//                if (!el.stats) {
+//                    noStats.push(noStats);
+////                    var a = statsService.getAdmonAproximations(el);
+////                    if(!a) {
+////                        //no deberia de pasar
+////                        console.log('shit happens');
+////                    }
+//                }
+//                cb();
+//            },
+//            function(err) {
+//                console.log(noStats.length);
+//                noStats.length.should.equal(0);
+//                done();
+//            });
+//          });
+//
+//      });
   });
 
 
