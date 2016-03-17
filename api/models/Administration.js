@@ -20,7 +20,8 @@ module.exports = {
     obligations : {
       collection : 'debtObligation',
       via : 'administration'
-    }
+    },
+    stats : 'json'
   }
 };
 

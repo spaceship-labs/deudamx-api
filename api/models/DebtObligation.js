@@ -66,6 +66,7 @@ module.exports = {
         'Inversión pública productiva',
         'Inversión pública productiva/refinanciamiento',
         'Refinanciamiento',
+        'Inversión pública productiva',
         //error
         'No data'
       ]

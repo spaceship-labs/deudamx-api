@@ -154,8 +154,10 @@ function setPerCapita(stats) {
 function importAdministrations(data) {
   var deferred = q.defer();
   data.splice(0,1);
+  console.log("Administrations count " + data.length);
   async.mapSeries(data, importAdministration, function(e, res) {
     if (e) {
+      console.log(e);
       deferred.reject(e);
     } else {
       deferred.resolve(res);
@@ -206,6 +208,7 @@ function importRecord(data, headers, collection, normalizeStrings, cb) {
     }
   }).exec(function(e, entity) {
     if (e) {
+        console.log(e);
         cb(e);
     }
     if (!entity) {
@@ -222,7 +225,7 @@ function importRecord(data, headers, collection, normalizeStrings, cb) {
             if(normalizeStrings && typeof data[i + 1] == 'string'){
                 record[headers[i]] = data[i + 1].trim().toLowerCase().capitalizeFirstLetter();
             }else{
-                console.log(data[i + 1]);
+                //console.log(data[i + 1]);
                 record[headers[i]] = data[i + 1];
             }
         }
@@ -233,6 +236,7 @@ function importRecord(data, headers, collection, normalizeStrings, cb) {
                 //console.log(err);
                 record.error = err.toString();
                 record.destination = 'No data';
+                console.log(err);
                 collection.create(record).exec(function(er,r){
                     cb(er,r);
                 });

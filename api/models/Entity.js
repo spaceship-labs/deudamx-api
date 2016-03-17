@@ -29,20 +29,10 @@ module.exports = {
       index: true
     },
     gdpdebt: function() {
-      var name = this.name;
-      //console.log(name);
-      return this.stats.map(function(stat) {
-        stat.gdpdebt = stat.debt / (stat.gdp / 1000) * 100;
-        //Check for statistical diference with the source file.
-        if (stat.debtpib) {
-          var diff = Math.round((stat.gdpdebt - stat.debtpib) * 100) / 100;
-          if (Math.abs(diff) > 0.05) {
-            //console.log(name, stat.year, diff);
-          }
-        }
-        return stat;
-      });
-
+      for (var i = 0;i<this.stats.length;i++) {
+          this.stats[i].gdpdebt = this.stats[i].debt / (this.stats[i].gdp / 1000) * 100;
+      }
+      return this.stats;
     }
   },
 

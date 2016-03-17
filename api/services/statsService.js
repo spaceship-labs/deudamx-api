@@ -46,15 +46,15 @@ function getAdmonAproximations(admon) {
     var start = {
       debt: getLinearAproximation(debtVector, admon.start),
       debtgdp: getLinearAproximation(gdpVector, admon.start),
-      debtPerCapita: getLinearAproximation(perCapitaVector, admon.start),
+      debtPerCapita: getLinearAproximation(perCapitaVector, admon.start)
     }
     if(!admon.end){
-      admon.end = '2016';
+      admon.end = '2015';
     }
     var end = {
       debt: getLinearAproximation(debtVector, admon.end),
       debtgdp: getLinearAproximation(gdpVector, admon.end),
-      debtPerCapita: getLinearAproximation(perCapitaVector, admon.end),
+      debtPerCapita: getLinearAproximation(perCapitaVector, admon.end)
     }
 
     return {
@@ -84,6 +84,7 @@ function mapVector(stats, field) {
 
 function getLinearAproximation(vector, date) {
   var i;
+  var y = 0;
   date = new Date(date);
   var x = date.getTime();
 
@@ -92,15 +93,22 @@ function getLinearAproximation(vector, date) {
       break;
     }
   }
-  if(i === 0){
-    return vector[0][1];
-  }else{
-    var start = vector[i - 1];
-    var end = vector[i];
-    var m = (end[1] - start[1]) / (end[0] - start[0]);
-    var b = end[1] - m * end[0];
-    var y = m * x + b;
+  try {
+      if(i === 0){
+          return vector[0][1];
+      }else{
+          var start = vector[i - 1];
+          var end = vector[i];
+          var m = (end[1] - start[1]) / (end[0] - start[0]);
+          var b = end[1] - m * end[0];
+          y = m * x + b;
+      }
+  } catch(ex) {
+      console.log(ex);
+      console.log(vector);
+      console.log(date);
   }
+
   return y;
 }
 
@@ -111,9 +119,15 @@ function setAdmonStats(admon) {
     obStats: calculateStatsFromObligations(admon.obligations),
     entityStats: getAdmonAproximations(admon),
   };
-  console.log(i++);
-  return Administration.update(admon.id, {
+
+  Administration.update(admon.id, {
     stats: stats
+  }).exec(function(err,a) {
+      if (err) {
+          console.log(err);
+      }
+      console.log(i++);
+      return a;
   });
 }
 
