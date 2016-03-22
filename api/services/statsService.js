@@ -21,19 +21,17 @@ module.exports = {
     console.log('setting administration stats');
     return Administration
       .find()
-      //.skip(30)
-      //.limit(40)
       .populate('obligations')
       .populate('entity')
       .then(function(admons) {
         return q.all(admons.map(setAdmonStats));
       });
   },
-  calculateGDPDebt : calculateGDPDebt,
+  calculateGDPDebt: calculateGDPDebt,
   getAdmonAproximations: getAdmonAproximations
 }
 
-function calculateGDPDebt(){
+function calculateGDPDebt() {
 
 }
 
@@ -42,14 +40,13 @@ function getAdmonAproximations(admon) {
     var debtVector = mapVector(admon.entity.stats, 'debt');
     var gdpVector = mapVector(admon.entity.stats, 'gdpdebt');
     var perCapitaVector = mapVector(admon.entity.stats, 'perCapita');
-
     var start = {
       debt: getLinearAproximation(debtVector, admon.start),
       debtgdp: getLinearAproximation(gdpVector, admon.start),
       debtPerCapita: getLinearAproximation(perCapitaVector, admon.start)
     }
-    if(!admon.end){
-      admon.end = '2015';
+    if (!admon.end) {
+      admon.end = '2016';
     }
     var end = {
       debt: getLinearAproximation(debtVector, admon.end),
@@ -66,7 +63,7 @@ function getAdmonAproximations(admon) {
         debtPerCapita: end.debtPerCapita - start.debtPerCapita
       }
     };
-  }else{
+  } else {
     return false;
   }
 }
@@ -85,8 +82,8 @@ function mapVector(stats, field) {
 function getLinearAproximation(vector, date) {
   var i;
   var y = 0;
-  date = new Date(date);
-  var x = date.getTime();
+  _date = new Date(date);
+  var x = _date.getTime();
 
   for (i = 0; i < vector.length; i++) {
     if (vector[i][0] >= x) {
@@ -94,19 +91,23 @@ function getLinearAproximation(vector, date) {
     }
   }
   try {
-      if(i === 0){
-          return vector[0][1];
-      }else{
-          var start = vector[i - 1];
-          var end = vector[i];
-          var m = (end[1] - start[1]) / (end[0] - start[0]);
-          var b = end[1] - m * end[0];
-          y = m * x + b;
-      }
-  } catch(ex) {
-      console.log(ex);
-      console.log(vector);
-      console.log(date);
+    //if the date is before vector starts
+    if (i === 0) {
+      return vector[0][1];
+    //if the date is after vector ends (or not there)
+    }else if(i === vector.length){
+      return vector[vector.length-1][1];
+    }else{
+      var start = vector[i - 1];
+      var end = vector[i];
+      var m = (end[1] - start[1]) / (end[0] - start[0]);
+      var b = end[1] - m * end[0];
+      y = m * x + b;
+    }
+  } catch (ex) {
+    console.log(ex);
+    console.log(vector, i);
+    console.log(date);
   }
 
   return y;
@@ -120,14 +121,16 @@ function setAdmonStats(admon) {
     entityStats: getAdmonAproximations(admon),
   };
 
-  Administration.update(admon.id, {
-    stats: stats
-  }).exec(function(err,a) {
-      if (err) {
-          console.log(err);
-      }
-      console.log(i++);
-      return a;
+  return Administration.update(admon.id, {
+    stats: stats,
+    deltaDebt : stats.entityStats.delta.debt,
+    deltaDebtgdp : stats.entityStats.delta.debtgdp,
+    deltaDebtPerCapita : stats.entityStats.delta.debtPerCapita,
+  }).exec(function(err, a) {
+    if (err) {
+      console.log(err);
+    }
+    return a;
   });
 }
 

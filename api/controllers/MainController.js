@@ -15,7 +15,7 @@ module.exports = {
       description: 'contains information about sub-national public debt in Mexico'
     });
 
-  },
+  },/*
   install: function(req, res) {
     installService.all()
       .then(res.json.bind(res), res.json.bind(res));
@@ -26,6 +26,6 @@ module.exports = {
     statsService.setAdmonStats()
       .then(res.json.bind(res), res.json.bind(res));
   }
-
+*/
 
 };

@@ -23,6 +23,10 @@ module.exports = {
       .then(function(stats){
         console.log('done');
       });
+  },
+
+  test: function(req, res) {
+    return statsService.setAdmonStats();
   }
 
 };
